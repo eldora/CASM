@@ -3,14 +3,14 @@
 
 // if return 0 then, syntax error!!
 xxbit_t wordParsing(char *pWord[], int wordNumber){
-	xxbit_t binaryCode = 0;
+	xxbit_t binaryCode;
 	xxbit_t rd, fg, rn, or;
 	optype_t opcode;
 
 	int i;
 	char ch, *ps, *pd, temp[10];
 
-	rd = fg = rn = or = 0;
+	binaryCode = rd = fg = rn = or = 0;
 
 	// Step1. 읽어온 라인의 OPCODE를 OPTABLE에서 찾는다
 	for(i=0; i<BIT_TYPE; i++){					
@@ -50,14 +50,31 @@ xxbit_t wordParsing(char *pWord[], int wordNumber){
 			break;
 		case STR:
 		case LDR:
+			rd = atoi(pWord[1]+1);
+			rn = atoi(pWord[2]+1);
+			or = atoi(pWord[3]+1);
+			binaryCode |= ((rd<<POS_RD) | (rn<<POS_RN) | (or<<POS_OR));
 			break;
 		case B:
 		case BL:
+			or = atoi(pWord[1]+1);
+			binaryCode |= (or<<POS_OR);
 			break;
 		case IRET:
 			break;
 		case PUSH:
 		case POP:
+			ch = *(pWord[1]);
+			if(ch == 'r'){
+				fg = 0;
+				or = atoi(pWord[1]+1);
+			}else if(ch == '#'){
+				ch = *(pWord[1]+1);	
+				ch = (char)toupper(ch);
+				if(ch == 'V') fg = 1;
+				if(ch == 'A') fg = 2;
+			}
+			binaryCode |= (((fg&0x03)<<POSFG) | (or<<POS_OR));
 			break;
 		default:
 			break;
