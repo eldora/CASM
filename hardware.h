@@ -63,9 +63,31 @@ typedef unsigned char __u8;
 typedef unsigned short xxbit_t;
 typedef unsigned char bool;
 
+#define FALSE						0
+#define TRUE						1
+
 #define BIT_TYPE				16
 #define MEM_CODE_SIZE		1024
 #define MEM_DATA_SIZE		128
+
+#define MASK_OP					0xF000
+#define MASK_RD					0x0F00
+#define MASK_RN					0x00F0
+#define MASK_OR					0x000F
+#define MASK_FG					0x00C0
+#define MASK_IM					0x003F
+#define MASK_SF					0x0030
+#define MASK_R1					MASK_RN
+#define MASK_R2					MASK_OR
+
+#define POS_OP					12
+#define POS_RD					8
+#define POS_FG					6
+#define POS_RN					4
+#define POS_OR					0
+#define POS_SF					POS_RN
+#define POS_R1					POS_RN
+#define POS_R2					POS_OR
 
 /*** 하드웨어 구조체 선언 ***/
 
@@ -86,7 +108,7 @@ struct REG_STRUCT{
 struct OPSTRUCT{
 	char *opcode;							// OPCODE 문자열
 	optype_t binary;					// 변환될 Binary
-	bool (*op_func)(char *rn, char *rd, char *operand2);		//
+	bool (*op_func)(xxbit_t binary);		//
 };
 
 /** 2. Memory **/
@@ -119,5 +141,11 @@ extern struct MEM_STRUCT MEM;
  */
 
 void printMemory();
+void printCPU();
+
+/*** OPCODE 함수 선언 ***/
+bool add_func(xxbit_t);
+bool sub_func(xxbit_t);
+bool mov_func(xxbit_t);
 
 #endif

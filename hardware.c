@@ -9,8 +9,8 @@ struct REG_STRUCT REG[BIT_TYPE] = {
 	{0, "r12"},	{0, "r13"},	{0, "r14"},	{0, "r15"},
 };
 struct OPSTRUCT OPTABLE[BIT_TYPE] = {
-	{"ADD", ADD, NULL}, {"SUB", SUB, NULL},
-	{"MOV", MOV, NULL}, {"AND", AND, NULL},
+	{"ADD", ADD, add_func}, {"SUB", SUB, sub_func},
+	{"MOV", MOV, mov_func}, {"AND", AND, NULL},
 	{"ORR", ORR, NULL}, {"CMP", CMP, NULL},
 	{"STR", STR, NULL}, {"LDR", LDR, NULL}, 
 	{"B"	, B  , NULL}, {"BL"	, BL , NULL},
@@ -24,9 +24,72 @@ void printMemory(){
 	int i;
 	printf("===CODE SECTION===\n");
 	for(i=0; i<MEM.code_lastIndex; i++)
-		printf("%x\n", MEM.code[i]);
+		printf("%04x\n", MEM.code[i]);
 
 	printf("===DATA SECTION===\n");
 	for(i=0; i<MEM.data_lastIndex; i++)
-		printf("%x\n", MEM.data[i]);
+		printf("%04x\n", MEM.data[i]);
+}
+
+void printCPU(){
+	int i;
+	for(i=0; i<BIT_TYPE; i++)
+		printf("REG%02d: %d\n", i, REG[i].reg);
+}
+
+/*** OPCODE 함수 ***/
+bool add_func(xxbit_t binary){
+	int rdIndex, r1Index, r2Index;
+
+	rdIndex = (binary & MASK_RD)>>POS_RD;
+	r1Index = (binary & MASK_R1)>>POS_R1;
+	r2Index = (binary & MASK_R2)>>POS_R2;
+	
+	REG[rdIndex].reg = REG[r1Index].reg + REG[r2Index].reg;
+
+	return TRUE;
+}
+
+bool sub_func(xxbit_t binary){
+	int rdIndex, r1Index, r2Index;
+
+	rdIndex = (binary & MASK_RD)>>POS_RD;
+	r1Index = (binary & MASK_R1)>>POS_R1;
+	r2Index = (binary & MASK_R2)>>POS_R2;
+	
+	REG[rdIndex].reg = REG[r1Index].reg - REG[r2Index].reg;
+
+	return TRUE;
+}
+
+bool mov_func(xxbit_t binary){
+	int rdIndex, operand;
+	int flag, shiftValue;
+
+	rdIndex = operand = flag = shiftValue = 0;
+
+	rdIndex = (binary & MASK_RD)>>POS_RD;
+	flag		= (binary & MASK_FG)>>POS_FG;
+
+	switch(flag){
+		case 0:													// Register
+			operand = (binary & MASK_OR);
+			REG[rdIndex].reg = REG[operand].reg;
+			break;
+		case 1:													// Immediate Value
+			operand = (binary & MASK_IM);
+			REG[rdIndex].reg = operand;
+			break;
+		case 2:													// Shift & Immediate Value
+			shiftValue = (binary & MASK_SF)>>POS_SF;
+			operand = (binary & MASK_OR);
+			REG[rdIndex].reg = operand<<(4*shiftValue);
+			break;
+		case 3:
+			break;
+		default:
+			break;
+	}
+
+	return TRUE;
 }

@@ -1,10 +1,16 @@
 #include "hardware.h"
 #include "parsing.h"
 
+// if return 0 then, syntax error!!
 xxbit_t wordParsing(char *pWord[], int wordNumber){
-	int i;
 	xxbit_t binaryCode = 0;
+	xxbit_t rd, fg, rn, or;
 	optype_t opcode;
+
+	int i;
+	char ch, *ps, *pd, temp[10];
+
+	rd = fg = rn = or = 0;
 
 	// Step1. 읽어온 라인의 OPCODE를 OPTABLE에서 찾는다
 	for(i=0; i<BIT_TYPE; i++){					
@@ -18,11 +24,29 @@ xxbit_t wordParsing(char *pWord[], int wordNumber){
 	switch(opcode){																							// OPTYPE별로 포맷에 따라 해석
 		case ADD:
 		case SUB:
+			rd = atoi(pWord[1]+1);
+			rn = atoi(pWord[2]+1);
+			or = atoi(pWord[3]+1);
+			binaryCode |= ((rd<<POS_RD) | (rn<<POS_RN) | (or<<POS_OR));
 			break;
 		case MOV:
 		case AND:
 		case ORR:
 		case CMP:
+			rd = atoi(pWord[1]+1);
+			ch = *(pWord[2]);																			// pWord[2]의 첫번째 문자를 파악하여 어떤 형식(레지스터, 상수, 시프트 상수연산)으로 썼는지 확인한다
+			if(ch == 'r'){
+				fg = 0;
+				or = atoi(pWord[2]+1);
+			}else if(ch == '#'){
+				fg = 1;
+				or = atoi(pWord[2]+1);
+			}else if(ch == '<'){
+				fg = 2;
+				rn = atoi(pWord[2]+1);
+				or = atoi(pWord[3]+1);
+			}
+			binaryCode |= ((rd<<POS_RD) | ((fg&0x03)<<POS_FG) | ((rn&0x03)<<POS_RN) | (or<<POS_OR));
 			break;
 		case STR:
 		case LDR:
@@ -48,7 +72,7 @@ xxbit_t wordParsing(char *pWord[], int wordNumber){
 }
 
 /*** ASEMMBLY -> BINARY Function ***/
-void asm2bin(char *asmtxt){
+bool asm2bin(char *asmtxt){
 	char buf[255];
 	char *pLine[10], *pWord[5];
 	int fd, lineNumber, wordNumber, i, j, optSize;
@@ -56,7 +80,7 @@ void asm2bin(char *asmtxt){
 	if((fd = open(asmtxt, O_RDONLY)) < 0){											// 어셈블리어 텍스트 파일 로드
 		printf("%s file can't open!!\n", asmtxt);
 		close(fd);
-		return;
+		return FALSE;
 	}
 
 	read(fd, buf, 255);																					// 버퍼만큼 읽음(추후 수정)
@@ -74,6 +98,7 @@ void asm2bin(char *asmtxt){
 
 		MEM.code[MEM.code_lastIndex++] = wordParsing(pWord, wordNumber-1);
 	}
+	return TRUE;
 }
 
 /*** BINARY -> COMMAND Function ***/
@@ -86,6 +111,17 @@ void asm2bin(char *asmtxt){
  * 5. CODE_INDEX까지 루프를 돌며 1-4의 작업을 반복한다.
  *
  */
-void bin2com(){
 
+bool bin2com(){
+	optype_t opcode;
+	xxbit_t binary;
+	int i;
+	
+	for(i=0; i<MEM.code_lastIndex; i++){
+		binary = MEM.code[i];
+		opcode = (binary & MASK_OP) >> POS_OP;
+		OPTABLE[opcode].op_func(binary);
+	}
+
+	return TRUE;
 }
