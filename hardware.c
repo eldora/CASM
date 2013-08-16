@@ -93,3 +93,154 @@ bool mov_func(xxbit_t binary){
 
 	return TRUE;
 }
+
+bool and_func(xxbit_t binary){
+	int rdIndex, operand;
+	int flag, shiftValue;
+
+	rdIndex = operand = flag = shiftValue = 0;
+
+	rdIndex = (binary & MASK_RD)>>POS_RD;
+	flag		= (binary & MASK_FG)>>POS_FG;
+
+	switch(flag){
+		case 0:													// Register
+			operand = (binary & MASK_OR);
+			REG[rdIndex].reg &= REG[operand].reg;
+			break;
+		case 1:													// Immediate Value
+			operand = (binary & MASK_IM);
+			REG[rdIndex].reg &= operand;
+			break;
+		case 2:													// Shift & Immediate Value
+			shiftValue = (binary & MASK_SF)>>POS_SF;
+			operand = (binary & MASK_OR);
+			REG[rdIndex].reg &= operand<<(4*shiftValue);
+			break;
+		case 3:
+			break;
+		default:
+			break;
+	}
+
+	return TRUE;
+
+}
+
+bool orr_func(xxbit_t binary){
+	int rdIndex, operand;
+	int flag, shiftValue;
+
+	rdIndex = operand = flag = shiftValue = 0;
+
+	rdIndex = (binary & MASK_RD)>>POS_RD;
+	flag		= (binary & MASK_FG)>>POS_FG;
+
+	switch(flag){
+		case 0:													// Register
+			operand = (binary & MASK_OR);
+			REG[rdIndex].reg |= REG[operand].reg;
+			break;
+		case 1:													// Immediate Value
+			operand = (binary & MASK_IM);
+			REG[rdIndex].reg |= operand;
+			break;
+		case 2:													// Shift & Immediate Value
+			shiftValue = (binary & MASK_SF)>>POS_SF;
+			operand = (binary & MASK_OR);
+			REG[rdIndex].reg |= operand<<(4*shiftValue);
+			break;
+		case 3:
+			break;
+		default:
+			break;
+	}
+
+	return TRUE;
+}
+
+bool cmp_func(xxbit_t binary){
+	int rdIndex, operand;
+	int flag, shiftValue, result;
+
+	rdIndex = operand = flag = shiftValue = 0;
+
+	rdIndex = (binary & MASK_RD)>>POS_RD;
+	flag		= (binary & MASK_FG)>>POS_FG;
+
+	switch(flag){
+		case 0:													// Register
+			operand = (binary & MASK_OR);
+			result = REG[rdIndex].reg - REG[operand].reg;
+			break;
+		case 1:													// Immediate Value
+			operand = (binary & MASK_IM);
+			result = REG[rdIndex].reg - operand;
+			break;
+		case 2:													// Shift & Immediate Value
+			shiftValue = (binary & MASK_SF)>>POS_SF;
+			operand = (binary & MASK_OR);
+			result = REG[rdIndex].reg - (operand<<(4*shiftValue));
+			break;
+		case 3:
+			break;
+		default:
+			break;
+	}
+
+	if(result==0){
+		CLU.n = 0;
+		CLU.z = 1;
+	}else if(result<0){
+		CLU.n = 1;
+		CLU.z = 0;
+	}else{
+		CLU.n = 0;
+		CLU.z = 0;
+	}
+
+	return TRUE;
+}
+
+bool str_func(xxbit_t binary){
+	int rdIndex, baseIndex, offsetIndex;
+	xxbit_t *baseAddr;
+
+	rdIndex = (binary & MASK_RD)>>POS_RD;
+	baseIndex = (binary & MASK_RN)>>POS_RN;
+	offsetIndex = (binary & MASK_OR)>>POS_OR;
+
+	baseAddr = REG[baseIndex].reg + REG[offsetIndex].reg;
+	*baseAddr = REG[rdIndex].reg;
+
+	return TRUE;
+}
+
+bool ldr_func(xxbit_t binary){
+	int rdIndex, baseIndex, offsetIndex;
+	xxbit_t *baseAddr;
+
+	rdIndex = (binary & MASK_RD)>>POS_RD;
+	baseIndex = (binary & MASK_RN)>>POS_RN;
+	offsetIndex = (binary & MASK_OR)>>POS_OR;
+
+	baseAddr = REG[baseIndex].reg + REG[offsetIndex].reg;
+	REG[rdIndex].reg = *baseAddr;
+
+	return TRUE;
+}
+
+bool b_func(xxbit_t binary){
+}
+
+bool bl_func(xxbit_t binary){
+}
+
+bool iret_func(xxbit_t binary){
+}
+
+bool push_func(xxbit_t binary){
+}
+
+bool pop_func(xxbit_t binary){
+}

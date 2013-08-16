@@ -42,7 +42,7 @@
 	typedef unsigned short optype_t;
 #endif
 
-typedef unsigned char __u8;
+typedef unsigned int  __u32;
 typedef unsigned short xxbit_t;
 typedef unsigned char bool;
 
@@ -62,8 +62,8 @@ typedef unsigned char bool;
 /** 1. CPU **/
 /* 1) CLU(Control Logic Unit) - 미완 */
 struct CLU_STRUCT{
-	__u8 mix:1;
-	__u8 ctrl:1;
+	__u32 n:1;													// 계산의 결과가 음수일 때 1로 체크됨
+	__u32 z:1;													// 계산의 결과가 0일때 1로 체크됨
 };
 
 /* 2) Register Bank */
@@ -106,5 +106,15 @@ void printCPU();
 bool add_func(xxbit_t);
 bool sub_func(xxbit_t);
 bool mov_func(xxbit_t);
+bool and_func(xxbit_t);
+bool orr_func(xxbit_t);
+bool cmp_func(xxbit_t);
+bool str_func(xxbit_t);
+bool ldr_func(xxbit_t);
+bool b_func(xxbit_t);
+bool bl_func(xxbit_t);
+bool iret_func(xxbit_t);
+bool push_func(xxbit_t);
+bool pop_func(xxbit_t);
 
 #endif

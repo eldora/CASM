@@ -74,7 +74,7 @@ xxbit_t wordParsing(char *pWord[], int wordNumber){
 				if(ch == 'V') fg = 1;
 				if(ch == 'A') fg = 2;
 			}
-			binaryCode |= (((fg&0x03)<<POSFG) | (or<<POS_OR));
+			binaryCode |= (((fg&0x03)<<POS_FG) | (or<<POS_OR));
 			break;
 		default:
 			break;
