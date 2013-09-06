@@ -71,19 +71,40 @@
   ------- | ------- | ------- | ------- | -------  | -------
   4bit    | 4b      | 4b      | 4b      | Register | Rd = [Rn(BaseAddr) + Operand(Offset)]
   
-4. B, BL
+4. B, BL, BX, IRET
 
-  Opcode  | Reversed | Operand | Usage     
-  ------- | -------  | ------- | -------
-  4bit    | 8b       | 4b      | Register
+  Opcode   | Type     | CPSR F   | Rd(Addr) | Detail    
+  -------  | -------  | -------  | -------  | ------
+  4bit     | 4b       | 4b       | 4b       | mov pc, lr
 
-5. IRET
+* *Variable Type*
+  Type    | CPSR F  | Detail    
+  ------- | ------- | ------- 
+	0000    | 0000    | B
+	0001    | 0000    | BL
+	0002    | 0000    | BX
+	0003    | 0000    | IRET
 
-  Opcode  | Reversed | Detail    
-  ------- | -------  | -------
-  4bit    | 12b      | mov pc, lr
+* *Variable CPSR-Flag*
+  Type    | CPSR F  | Suffix  | Condition
+  ------- | ------- | ------- | -------
+	0000    | 0000    | NONE    | None
+	0000    | 0010    | EQ      | [Z] Set
+	0000    | 0011    | NE      | [Z] Clear
+	0000    | 0100    | GT      | [Z] Clear && (N=V)
+	0000    | 0101    | LT      | [N] ≠ [V]
+	0000    | 0110    | GE      | [N] = [V]
+	0000    | 0111    | LE      | [Z] Set || ([N]≠[V])
 
-6. PUSH, POP
+* *CPSR Condition*
+  CPSR    | Set(1)          | Clear(0)    
+  ------- | -------         | ------- 
+	[Z]     | Equal           | Not Equal
+	[N]     | Negative Number | 0 or Positive Number
+	[V]     | Overflow        | No Overflow
+
+
+5. PUSH, POP
 
   If F=?  | Opcode  | Rev     | F       | Rev     | Operand | Usage    | Detail
   ------- | ------- | ------- | ------- | ------- | ------- | -------  | -------  
