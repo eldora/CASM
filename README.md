@@ -16,6 +16,10 @@
 - 명령어 처리 구현(ldr까지, TEST X)
 + str, ldr 명령어에서 baseAddr를 default Register로 정할지 말지 정해야 한다.
 
+#### v1.4(20130906) ####
+- Branch Type Defined
++ str, ldr 명령어에서 baseAddr를 default Register로 정할지 말지 정해야 한다.
+
 ### 해야할 일 ###
 - 각 OPCODE에 대해 그림과 instruct set 명령어를 서술
 - 어셈블리 파싱단계에서 라벨처리 부분을 어떻게 구현할지 고려
@@ -77,7 +81,6 @@
   -------  | -------  | -------  | -------  | ------
   4bit     | 4b       | 4b       | 4b       | mov pc, lr
 
-* *Variable Type*
   Type    | CPSR F  | Detail    
   ------- | ------- | ------- 
 	0000    | 0000    | B
@@ -85,7 +88,6 @@
 	0002    | 0000    | BX
 	0003    | 0000    | IRET
 
-* *Variable CPSR-Flag*
   Type    | CPSR F  | Suffix  | Condition
   ------- | ------- | ------- | -------
 	0000    | 0000    | NONE    | None
@@ -96,7 +98,6 @@
 	0000    | 0110    | GE      | [N] = [V]
 	0000    | 0111    | LE      | [Z] Set || ([N]≠[V])
 
-* *CPSR Condition*
   CPSR    | Set(1)          | Clear(0)    
   ------- | -------         | ------- 
 	[Z]     | Equal           | Not Equal
