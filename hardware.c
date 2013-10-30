@@ -1,14 +1,26 @@
 #include "hardware.h"
 
 /*** 하드웨어 구조체 전역변수 초기화 ***/
-struct CLU_STRUCT CLU = {0,};
+struct CLU_STRUCT *pCLU;
+struct CLU_STRUCT CLU_TABLE[BIT_TYPE][CLU_MODE][CLU_TABLE_SIZE] = {
+	{{add_func, CLU_W, CLU_R, CLU_R, 0, 0, 0, 0, 0, 0, 0}, },				// ADD, MODE TYPE:1
+	{{sub_func, CLU_W, CLU_R, CLU_R, 0, 0, 0, 0, 0, 0, 0}, },				// SUB, MODE TYPE:1
+	{{mul_func, CLU_W, CLU_R, CLU_R, 0, 0, 0, 0, 0, 0, 0}, },				// MUL, MODE TYPE:1
+	{{div_func, CLU_W, CLU_R, CLU_R, 0, 0, 0, 0, 0, 0, 0}, },				// DIV, MODE TYPE:1
+	{{NULL, CLU_W, CLU_R, CLU_R, 0, 0, 0, 0, 0, 0, 0}, 
+	 {NULL, CLU_W, CLU_R, CLU_R, 0, ?, 0, 0, 0, 0, 0}, 
+	 {NULL, CLU_W, CLU_R, CLU_R, 0, ?, 0, 0, 0, 0, 0}, },						// MOV, MODE TYPE:3
+
+	{{NULL, CLU_W, CLU_R, CLU_R, 0, 0, 0, 0, 0, 0, 0}, },						// MOV, MODE TYPE:1
+};
+struct CPSR_STRUCT CPSR = {0,};
 struct REG_STRUCT REG[BIT_TYPE] = {
 	{0, "r0"},	{0, "r1"},	{0, "r2"},	{0, "r3"},
 	{0, "r4"},	{0, "r5"},	{0, "r6"},	{0, "r7"},
 	{0, "r8"},	{0, "r9"},	{0, "r10"},	{0, "r11"},
 	{0, "r12"},	{0, "r13"},	{0, "r14"},	{0, "r15"},
 };
-struct OPSTRUCT OPTABLE[BIT_TYPE] = {
+struct OP_STRUCT OPTABLE[BIT_TYPE] = {
 	{"ADD", ADD, add_func}, {"SUB", SUB, sub_func},
 	{"MOV", MOV, mov_func}, {"AND", AND, NULL},
 	{"ORR", ORR, NULL}, {"CMP", CMP, NULL},
@@ -37,8 +49,8 @@ void printCPU(){
 		printf("REG%02d: %d\n", i, REG[i].reg);
 }
 
-/*** OPCODE 함수 ***/
-bool add_func(xxbit_t binary){
+/*** ALU Function ***/
+bool add_func(xxbit_t param){
 	int rdIndex, r1Index, r2Index;
 
 	rdIndex = (binary & MASK_RD)>>POS_RD;

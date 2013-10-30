@@ -9,6 +9,18 @@
 #define BIT_TYPE				16
 #define MEM_CODE_SIZE		1024
 #define MEM_DATA_SIZE		128
+#define CLU_TABLE_SIZE		11
+#define CLU_MODE				4
+
+#define IP_REG_INDEX		12
+#define SP_REG_INDEX		13
+#define LR_REG_INDEX		14
+#define PC_REG_INDEX		15
+
+// CLU_TABLE_MACRO
+#define CLU_R						0
+#define CLU_W						1
+#define UNUSED_BIT			0
 
 #define MASK_OP					0xF000
 #define MASK_RD					0x0F00
@@ -34,16 +46,18 @@
 // OPCODE 순서와 OPTABLE 순서는 동일해야 함
 #ifdef USING_ENUM_TYPE
 	enum OPCODE{
-		ADD=0b0000, SUB, MOV, AND, ORR, CMP,
-		STR, LDR, B, BL, IRET, PUSH, POP,
+		ADD=0b0000, SUB, MUL, DIV, MOV, AND, ORR, CMP,
+		LDR, STR, B, PUSH, POP,
 	};
 	typedef enum OPCODE optype_t;
 #else
 	typedef unsigned short optype_t;
 #endif
 
-typedef unsigned int  __u32;
-typedef unsigned short xxbit_t;
+typedef unsigned int  clu_t;
+typedef unsigned char cpsr_t;
+typedef unsigned short xxbit_t;				// CASM binary Data Type
+typedef short basic_t;								// CASM basic  Data Type	
 typedef unsigned char bool;
 
 /*	Hardware Abstruct(추상화)
@@ -60,23 +74,39 @@ typedef unsigned char bool;
 /*** 하드웨어 구조체 선언 ***/
 
 /** 1. CPU **/
-/* 1) CLU(Control Logic Unit) - 미완 */
+/* 1) CLU(Control Logic Unit) */
 struct CLU_STRUCT{
-	__u32 n:1;													// 계산의 결과가 음수일 때 1로 체크됨
-	__u32 z:1;													// 계산의 결과가 0일때 1로 체크됨
+	bool  (*ALUFN)(basic_t param1, basic_t param2);
+	clu_t WERF:1;
+	clu_t WEDF:1;
+	clu_t WESF:1;
+	clu_t LRSF:1;
+	clu_t BSEL:2;
+	clu_t PCSEL:2;
+	clu_t ADSEL:1;
+	clu_t WDSEL:1;
+	clu_t RA1SEL:1;
+	clu_t RA2SEL:1;
+};
+
+/* 1-1) CPSR(Process State Register) */
+struct CPSR_STRUCT{
+	cpsr_t z:1;												// if set(1) then Equal else Not Equal
+	cpsr_t n:1;												// if set(1) then Negative Number else 0 or Positive Number
+	cpsr_t v:1;												// if set(1) then Overflow else No Overflow
 };
 
 /* 2) Register Bank */
 struct REG_STRUCT{
-	xxbit_t reg;												// Register Storage
-	char *regName;											// Register Name
+	basic_t data;										// Register Data Storage
+	char *name;											// Register Name
 };
 
 /* 3) Instruction Set */
-struct OPSTRUCT{
-	char *opcode;												// OPCODE 문자열
-	optype_t binary;										// 변환될 Binary
-	bool (*op_func)(xxbit_t binary);		// Instruct Function
+struct OP_STRUCT{
+	optype_t *opcode;												// OPCODE STRING 
+	xxbit_t binary;													// Binary CODE
+	struct CLU_STRUCT *pTable[CLU_MODE][CLU_TABLE_SIZE];		// CLU TABLE POINTER
 };
 
 /** 2. Memory **/
@@ -93,9 +123,11 @@ struct MEM_STRUCT{
 
 /*** 하드웨어 구조체 전역변수 선언 ***/
 /** 1. CPU **/
-extern struct CLU_STRUCT CLU;											// CLU Register
+extern struct CLU_STRUCT *pCLU;										// CLU Register
+extern struct CLU_TABLE[BIT_TYPE][CLU_MODE][CLU_TABLE_SIZE];			// CLU TABLE
+extern struct CPSR_STRUCT CPSR;
 extern struct REG_STRUCT REG[BIT_TYPE];						// Register Bank
-extern struct OPSTRUCT OPTABLE[BIT_TYPE];					// OPTABLE: CPU에서 실행가능한 Instruct SET의 집합
+extern struct OP_STRUCT OPTABLE[BIT_TYPE];				// OPTABLE: CPU에서 실행가능한 Instruct SET의 집합
 extern struct MEM_STRUCT MEM;											// Memory
 
 /*** Debug 함수 ***/
@@ -103,18 +135,11 @@ void printMemory();
 void printCPU();
 
 /*** OPCODE 함수 선언 ***/
-bool add_func(xxbit_t);
-bool sub_func(xxbit_t);
-bool mov_func(xxbit_t);
-bool and_func(xxbit_t);
-bool orr_func(xxbit_t);
-bool cmp_func(xxbit_t);
-bool str_func(xxbit_t);
-bool ldr_func(xxbit_t);
-bool b_func(xxbit_t);
-bool bl_func(xxbit_t);
-bool iret_func(xxbit_t);
-bool push_func(xxbit_t);
-bool pop_func(xxbit_t);
+bool add_func(basic_t, basic_t);
+bool sub_func(basic_t, basic_t);
+bool mov_func(basic_t, basic_t);
+bool and_func(basic_t, basic_t);
+bool orr_func(basic_t, basic_t);
+bool xor_func(basic_t, basic_t);
 
 #endif

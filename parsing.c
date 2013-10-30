@@ -34,7 +34,7 @@ xxbit_t wordParsing(char *pWord[], int wordNumber){
 		case ORR:
 		case CMP:
 			rd = atoi(pWord[1]+1);
-			ch = *(pWord[2]);																			// pWord[2]의 첫번째 문자를 파악하여 어떤 형식(레지스터, 상수, 시프트 상수연산)으로 썼는지 확인한다
+			ch = *(pWord[2]);																			// pWord[2]의 첫번째 문자를 파악하여 어떤 형식(레지스터<r>, 상수<#>, 시프트 상수연산<<>)으로 썼는지 확인한다
 			if(ch == 'r'){
 				fg = 0;
 				or = atoi(pWord[2]+1);
@@ -57,10 +57,9 @@ xxbit_t wordParsing(char *pWord[], int wordNumber){
 			break;
 		case B:
 		case BL:
+		case IRET:
 			or = atoi(pWord[1]+1);
 			binaryCode |= (or<<POS_OR);
-			break;
-		case IRET:
 			break;
 		case PUSH:
 		case POP:
@@ -141,4 +140,19 @@ bool bin2com(){
 	}
 
 	return TRUE;
+}
+
+bool runCPU(){
+	optype_t opcode;
+	xxbit_t binary;
+	struct REG_STRUCT *pIP_REG = &(REG[IP_REG_INDEX]);
+	struct REG_STRUCT *pSP_REG = &(REG[SP_REG_INDEX]);
+	struct REG_STRUCT *pLR_REG = &(REG[LR_REG_INDEX]);
+	struct REG_STRUCT *pPC_REG = &(REG[PC_REG_INDEX]);
+
+	for(;;){
+		binary = MEM.code[pPC_REG->data];
+		opcode = (binary & MASK_OP) >> POS_OP;				// OPCODE에 따라 CLU상태를 바꾼다
+			
+	}
 }
