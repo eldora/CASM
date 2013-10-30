@@ -25,7 +25,13 @@
 - CLU TABLE 구성 완료, CLU_TABLE.xlsx
 - CASM FORMAT 및 Path Diagram 정리, GradPortfolio.pptx
 
+#### v2.1(20131031) ####
+- HARDWARE 구성요소 정의 및 선언 완료
+
 ### 해야할 일 ###
+- workdParsing 함수 수정-보완된 포맷 형식에 맞게 변환
+- ALUFN 함수 결과값을 CPSR 상태 레지스터에 적용
+- runCPU 함수 완성 - CLU Table를 참조하여 동작하게끔 구현
 
 -------------------------------------------------------------------------------------------
 

@@ -13,7 +13,7 @@ xxbit_t wordParsing(char *pWord[], int wordNumber){
 	binaryCode = rd = fg = rn = or = 0;
 
 	// Step1. 읽어온 라인의 OPCODE를 OPTABLE에서 찾는다
-	for(i=0; i<BIT_TYPE; i++){					
+	for(i=0; i<OPCODE_NUMBER; i++){					
 		if(!strcmp(OPTABLE[i].opcode, pWord[0])){
 			opcode = OPTABLE[i].binary;
 			binaryCode |= (opcode<<POS_OP);
@@ -136,7 +136,7 @@ bool bin2com(){
 	for(i=0; i<MEM.code_lastIndex; i++){
 		binary = MEM.code[i];
 		opcode = (binary & MASK_OP) >> POS_OP;
-		OPTABLE[opcode].op_func(binary);
+		//OPTABLE[opcode].op_func(binary);
 	}
 
 	return TRUE;
