@@ -4,13 +4,13 @@
 // if return 0 then, syntax error!!
 xxbit_t wordParsing(char *pWord[], int wordNumber){
 	xxbit_t binaryCode;
-	xxbit_t rd, fg, rn, or;
+	xxbit_t rd, flag, rn, or, r1, r2, type, cpsr;
 	optype_t opcode;
 
 	int i;
-	char ch, *ps, *pd, temp[10];
+	char ch, *suffix[] = {"EQ", "NE", "GT", "LT", "GE", "LE"};
 
-	binaryCode = rd = fg = rn = or = 0;
+	binaryCode = rd = flag = rn = or = r1 = r2 = type = cpsr = 0;
 
 	// Step1. 읽어온 라인의 OPCODE를 OPTABLE에서 찾는다
 	for(i=0; i<OPCODE_NUMBER; i++){					
@@ -24,65 +24,92 @@ xxbit_t wordParsing(char *pWord[], int wordNumber){
 	switch(opcode){																							// OPTYPE별로 포맷에 따라 해석
 		case ADD:
 		case SUB:
-			rd = atoi(pWord[1]+1);
-			rn = atoi(pWord[2]+1);
-			or = atoi(pWord[3]+1);
-			binaryCode |= ((rd<<POS_RD) | (rn<<POS_RN) | (or<<POS_OR));
+		case MUL:
+		case DIV:
+			// ADD R3 R1 R2
+			// R3 = R1 + R2
+			rd = atoi(pWord[1]+1);																	// R3
+			r1 = atoi(pWord[2]+1);																	// R1
+			r2 = atoi(pWord[3]+1);																	// R2
+			binaryCode |= ((rd<<POS_RD) | (r1<<POS_R1) | (r2<<POS_R2));
 			break;
 		case MOV:
 		case AND:
 		case ORR:
 		case CMP:
+			// MOV R2 R1, MOV R2 #F0, MOV R2 <2 F
+			// R2 = R1, R2 = 0xF0, R2 = F<<4*2
 			rd = atoi(pWord[1]+1);
 			ch = *(pWord[2]);																			// pWord[2]의 첫번째 문자를 파악하여 어떤 형식(레지스터<r>, 상수<#>, 시프트 상수연산<<>)으로 썼는지 확인한다
-			if(ch == 'r'){
-				fg = 0;
+			if((char)tolower(ch) == 'r'){
+				flag = 0;
 				or = atoi(pWord[2]+1);
 			}else if(ch == '#'){
-				fg = 1;
+				flag = 1;
 				or = atoi(pWord[2]+1);
 			}else if(ch == '<'){
-				fg = 2;
+				flag = 2;
 				rn = atoi(pWord[2]+1);
 				or = atoi(pWord[3]+1);
 			}
-			binaryCode |= ((rd<<POS_RD) | ((fg&0x03)<<POS_FG) | ((rn&0x03)<<POS_RN) | (or<<POS_OR));
+			binaryCode |= ((rd<<POS_RD) | ((flag&0x03)<<POS_FG) | ((rn&0x03)<<POS_RN) | (or<<POS_OR));
 			break;
 		case STR:
 		case LDR:
+			// STR: *(R1(0x00F0)+0xF) = R2
+			// LDR: R2 = *(R1(0x0030)+0x1))
 			rd = atoi(pWord[1]+1);
 			rn = atoi(pWord[2]+1);
 			or = atoi(pWord[3]+1);
 			binaryCode |= ((rd<<POS_RD) | (rn<<POS_RN) | (or<<POS_OR));
 			break;
 		case B:
+			//	B	R1(0x0100), B NE R2(0x00F0)
+			type = 0;
+			goto B_COMMON;
 		case BL:
+			type = 1;
+			goto B_COMMON;
 		case IRET:
-			or = atoi(pWord[1]+1);
-			binaryCode |= (or<<POS_OR);
+			type = 2;
+B_COMMON:
+			ch = *(pWord[1]);
+			if((char)tolower(ch) == 'r')
+				or = atoi(pWord[1]+1);
+			else{
+				for(i=0; i<6; i++){
+					if(!strcmp(suffix[i], pWord[1])){
+						cpsr = i+3;														// CPSR 조건 플레그는 0b0010부터 시작함
+						break;
+					}
+				}
+				or = atoi(pWord[2]+1);
+			}
+			binaryCode |= ((type<<POS_TP) | (cpsr<<POS_CF)  | (or<<POS_OR));
 			break;
 		case PUSH:
 		case POP:
+			// PUSH r1, PUSH #V, POP #A
 			ch = *(pWord[1]);
-			if(ch == 'r'){
-				fg = 0;
+			if((char)tolower(ch) == 'r'){
+				flag = 0;
 				or = atoi(pWord[1]+1);
 			}else if(ch == '#'){
 				ch = *(pWord[1]+1);	
-				ch = (char)toupper(ch);
-				if(ch == 'V') fg = 1;
-				if(ch == 'A') fg = 2;
+				if((char)toupper(ch) == 'V') flag = 1;
+				if((char)toupper(ch) == 'A') flag = 2;
 			}
-			binaryCode |= (((fg&0x03)<<POS_FG) | (or<<POS_OR));
+			binaryCode |= (((flag&0x03)<<POS_FG) | (or<<POS_OR));
 			break;
 		default:
 			break;
 	}
-
+#if 1
 	printf("wordNumber: %d\n", wordNumber);
 	for(i=0; i<wordNumber; i++){
 		printf("%d: %s\n", (int)opcode, pWord[i]);
 	}
+#endif
 
 	return binaryCode;
 }

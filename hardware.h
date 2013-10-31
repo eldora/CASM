@@ -38,9 +38,11 @@
 #define POS_FG					6
 #define POS_RN					4
 #define POS_OR					0
-#define POS_SF					POS_RN
+#define POS_SF					POS_RN			// Shift Flag
 #define POS_R1					POS_RN
 #define POS_R2					POS_OR
+#define POS_TP					POS_RD			// Type
+#define POS_CF					POS_RN			// CPSR Flag
 
 #define USING_ENUM_TYPE
 
