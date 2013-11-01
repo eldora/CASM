@@ -2,7 +2,7 @@
 
 /*** 하드웨어 구조체 전역변수 초기화 ***/
 struct CLU_STRUCT *pCLU;
-struct CLU_STRUCT CLU_TABLE[BIT_TYPE][CLU_MODE][CLU_TABLE_SIZE] = {
+const struct CLU_STRUCT CLU_TABLE[BIT_TYPE][CLU_MODE][CLU_TABLE_SIZE] = {
 	{{add_func, CLU_W,	UNUSED, UNUSED, UNUSED, 0, 0, 0, 0, 0, 0, 0}, },			// ADD, MODE TYPE:1
 	{{sub_func, CLU_W,	UNUSED, UNUSED, UNUSED, 0, 0, 0, 0, 0, 0, 0}, },			// SUB, MODE TYPE:1
 	{{mul_func, CLU_W,	UNUSED, UNUSED, UNUSED, 0, 0, 0, 0, 0, 0, 0}, },			// MUL, MODE TYPE:1
@@ -34,7 +34,7 @@ struct REG_STRUCT REG[BIT_TYPE] = {
 	{0, "r8"},	{0, "r9"},	{0, "r10"},	{0, "r11"},
 	{0, "r12"},	{0, "r13"},	{0, "r14"},	{0, "r15"},
 };
-struct OP_STRUCT OPTABLE[OPCODE_NUMBER] = {
+const struct OP_STRUCT OP_TABLE[OPCODE_NUMBER] = {
 	{"ADD", ADD, CLU_TABLE[0]}, {"SUB", SUB, CLU_TABLE[1]},
 	{"MUL", MUL, CLU_TABLE[2]}, {"DIV", DIV, CLU_TABLE[3]},
 	{"MOV", MOV, CLU_TABLE[4]}, {"AND", AND, CLU_TABLE[5]},
@@ -65,28 +65,73 @@ void printCPU(){
 }
 
 /*** ALU Function ***/
-// 아직 CPSR 적용하지 않음
 basic_t add_func(basic_t param1, basic_t param2){
-	return param1 + param2;
+	basic_t result = param1 + param2;
+
+	if(SHRT_MAX - param1 < param2)
+		CPSR.v = 1;
+
+	CPSR.n = result < 0 ? 1 : 0;
+	CPSR.z = (param1==param2) ? 1 : 0;
+
+	return result;
 }
 basic_t sub_func(basic_t param1, basic_t param2){
-	return param1 - param2;
+	basic_t result = param1 - param2;
+
+	if(SHRT_MIN + param1 > param2)
+		CPSR.v = 1;
+
+	CPSR.n = result < 0 ? 1 : 0;
+	CPSR.z = (param1==param2) ? 1 : 0;
+
+	return result;
 }
 basic_t mul_func(basic_t param1, basic_t param2){
-	return param1 * param2;
+	basic_t result = param1 * param2;
+	
+	if(param1 != 0 && result / param1 != param2)
+		CPSR.v = 1;
+
+	CPSR.n = result < 0 ? 1 : 0;
+	CPSR.z = (param1==param2) ? 1 : 0;
+
+	return result;
 }
+// Overflow가 나올 경우의 수가 있나?
 basic_t div_func(basic_t param1, basic_t param2){
-	return param1 / param2;
+	basic_t result = param1 / param2;
+
+	CPSR.n = result < 0 ? 1 : 0;
+	CPSR.z = (param1==param2) ? 1 : 0;
+
+	return result;
 }
 basic_t and_func(basic_t param1, basic_t param2){
-	return param1 & param2;
+	basic_t result = param1 & param2;
+
+	CPSR.n = result < 0 ? 1 : 0;
+	CPSR.z = (param1==param2) ? 1 : 0;
+
+	return result;
 }
 basic_t orr_func(basic_t param1, basic_t param2){
-	return param1 | param2;
+	basic_t result = param1 | param2;
+
+	CPSR.n = result < 0 ? 1 : 0;
+	CPSR.z = (param1==param2) ? 1 : 0;
+
+	return result;
 }
 basic_t xor_func(basic_t param1, basic_t param2){
-	return param1 ^ param2;
+	basic_t result = param1 ^ param2;
+
+	CPSR.n = result < 0 ? 1 : 0;
+	CPSR.z = (param1==param2) ? 1 : 0;
+
+	return result;
 }
+
 /*
 bool add_func(xxbit_t param){
 	int rdIndex, r1Index, r2Index;

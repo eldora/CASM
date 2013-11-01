@@ -2,6 +2,7 @@
 #define __HARDWARE_H__
 
 #include <stdio.h>
+#include <limits.h>
 
 #define FALSE						0
 #define TRUE						1
@@ -46,7 +47,7 @@
 
 #define USING_ENUM_TYPE
 
-// OPCODE 순서와 OPTABLE 순서는 동일해야 함
+// OPCODE 순서와 OP_TABLE 순서는 동일해야 함
 // OPCODE INDEX는 0b0XXXX로 시작하고, 구별을 위해 필요한 부가적인 명령어는 0b1XXXX로 시작한다.
 #ifdef USING_ENUM_TYPE
 	enum OPCODE{
@@ -113,7 +114,7 @@ struct REG_STRUCT{
 struct OP_STRUCT{
 	char *opcode;														// OPCODE STRING 
 	xxbit_t binary;													// Binary CODE
-	struct CLU_STRUCT (*table)[CLU_TABLE_SIZE];		// CLU 2-dim TABLE POINTER: pTABLE[CLU_MODE][CLU_TABLE_SIZE]
+	const struct CLU_STRUCT (*table)[CLU_TABLE_SIZE];		// CLU 2-dim TABLE POINTER: pTABLE[CLU_MODE][CLU_TABLE_SIZE]
 };
 
 /** 2. Memory **/
@@ -130,12 +131,12 @@ struct MEM_STRUCT{
 
 /*** 하드웨어 구조체 전역변수 선언 ***/
 /** 1. CPU **/
-extern struct CLU_STRUCT *pCLU;										// CLU Register
-extern struct CLU_STRUCT CLU_TABLE[BIT_TYPE][CLU_MODE][CLU_TABLE_SIZE];			// CLU TABLE
+extern struct CLU_STRUCT *pCLU;											// CLU Register
+extern const struct CLU_STRUCT CLU_TABLE[BIT_TYPE][CLU_MODE][CLU_TABLE_SIZE];			// CLU TABLE
 extern struct CPSR_STRUCT CPSR;
-extern struct REG_STRUCT REG[BIT_TYPE];						// Register Bank
-extern struct OP_STRUCT OPTABLE[OPCODE_NUMBER];		// OPTABLE: CPU에서 실행가능한 Instruct SET의 집합
-extern struct MEM_STRUCT MEM;											// Memory
+extern struct REG_STRUCT REG[BIT_TYPE];							// Register Bank
+extern const struct OP_STRUCT OP_TABLE[OPCODE_NUMBER];		// CPU에서 실행가능한 Instruct SET의 집합
+extern struct MEM_STRUCT MEM;												// Memory
 
 /*** Debug 함수 ***/
 void printMemory();
