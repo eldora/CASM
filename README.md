@@ -34,8 +34,28 @@
 #### v2.3(20131101) ####
 - ALUFN 함수 결과값을 CPSR 상태 레지스터에 적용
 
+#### v3.0(20131104) ####
++ runCPU함수 완성, add_asm.txt만 정상작동, 정상 swap코드 테스트 요망
++ CLU_SWITCH를 보고 Component or Mux를 실행할지 안할지 결정
++ CLU_STRUCT에서 RERF추가 및 CLU_RW 메크로 추가
+- hardware.h: struct CLU_SWITCH 추가, enum SWITCH_XXX 추가
+- hardware.c: CLU_SWITCH Binary 추가
+- core.c: cReadRegister, cWriteRegister, cExecuteALU, selectBRYN, getOPCODE, getCLU_TABLE 함수 추가
+- Makefile: dubug 명령어 추가
+- pptx, xlsx 파일 업데이트(CLU_SWITCH 부분 추가 및 기타 요소 등...)
+
 ### 해야할 일 ###
++ parsing.c에서 전처리 과정으로 ip, sp, lr, pc 문자열을 r12,13,14,15로 변환과정을 추가해야 함
++ parsing.c에서 strtok로 EOF가 제대로 처리되지 않아 for문에서 lineNumber-2를 해줌(strtok에서 EOF판별법 알아보기)
+- TICK별로 CPU를 구동할 때 Register Bank를 Read, Write 상태로 설정해야 함(현재는 Write상태만)
 - runCPU 함수 완성 - CLU Table를 참조하여 동작하게끔 구현
+- rupCPU 구동 방식을 시뮬레이터에 가깝게 할지 에뮬레이터에 가깝게 할지 고민
+
+#### NOTE ####
+- 시뮬레이터는 현실과 동일하게 구성, 에뮬레이터는 실행결과가 동일하게 나오는 것
+- 컴포넌트(PC, MEM, ALU etc..)등을 어떻게 처리할지 고민(FLOW를 고정?)
+- Tick: CLU상에서의 내부 클럭 처리 단위
+- Instruction Clock: 실제 CPU클럭, 명령 실행 클럭 단위
 
 -------------------------------------------------------------------------------------------
 

@@ -54,10 +54,11 @@ xxbit_t wordParsing(char *pWord[], int wordNumber){
 			}
 			binaryCode |= ((rd<<POS_RD) | ((flag&0x03)<<POS_FG) | ((rn&0x03)<<POS_RN) | (or<<POS_OR));
 			break;
-		case STR:
 		case LDR:
-			// STR: *(R1(0x00F0)+0xF) = R2
+		case STR:
+			// LDR R2 R1 #1
 			// LDR: R2 = *(R1(0x0030)+0x1))
+			// STR: *(R1(0x00F0)+0xF) = R2
 			rd = atoi(pWord[1]+1);
 			rn = atoi(pWord[2]+1);
 			or = atoi(pWord[3]+1);
@@ -101,6 +102,8 @@ B_COMMON:
 			}
 			binaryCode |= (((flag&0x03)<<POS_FG) | (or<<POS_OR));
 			break;
+		case HALT:
+			break;
 		default:
 			break;
 	}
@@ -132,54 +135,14 @@ bool asm2bin(char *asmtxt){
 	pLine[lineNumber++] = strtok(buf, "\n");											// 라인별로 나눠서 해당 포인터를 pLine배열에 저장해놓음
 	while(pLine[lineNumber++] = strtok(NULL, "\n"));
 
-	for(i=0; i<lineNumber-1; i++){																// 라인을 읽어와 각 워드를 읽고 이에 맞는 binary값을 써줌
+	for(i=0; i<lineNumber-2; i++){																// 라인을 읽어와 각 워드를 읽고 이에 맞는 binary값을 써줌
 		memset(pWord, 0, sizeof(pWord));
 		wordNumber = 0;
 
 		pWord[wordNumber++] = strtok(pLine[i], "\t ");
 		while(pWord[wordNumber++] = strtok(NULL, "\t "));
 
-		MEM.code[MEM.code_lastIndex++] = wordParsing(pWord, wordNumber-1);
+		MEM.code[MEM.code_lastIndex++] = wordParsing(pWord, wordNumber-1);	// Debug용으로 workNumber를 매개변수로 넘겨줌
 	}
 	return TRUE;
-}
-
-/*** BINARY -> COMMAND Function ***/
-/*
- * ## CODE_INDEX까지 한 라인씩 바이너리를 읽어와 수행
- * 1. 현재 행의 OPCODE를 파악한다
- * 2. OPCODE에 맞게 나머지 12bit에서 정보를 읽어온다.
- * 3. OPCODE에 맞는 함수를 실행시킨다. 이 때 매개변수는 12bit에서 읽어온 정보를 바탕으로 정해준다.
- * 4. 실행된 함수는 각 함수에 맞는 일을 수행한다.
- * 5. CODE_INDEX까지 루프를 돌며 1-4의 작업을 반복한다.
- *
- */
-
-bool bin2com(){
-	optype_t opcode;
-	xxbit_t binary;
-	int i;
-	
-	for(i=0; i<MEM.code_lastIndex; i++){
-		binary = MEM.code[i];
-		opcode = (binary & MASK_OP) >> POS_OP;
-		//OP_TABLE[opcode].op_func(binary);
-	}
-
-	return TRUE;
-}
-
-bool runCPU(){
-	optype_t opcode;
-	xxbit_t binary;
-	struct REG_STRUCT *pIP_REG = &(REG[IP_REG_INDEX]);
-	struct REG_STRUCT *pSP_REG = &(REG[SP_REG_INDEX]);
-	struct REG_STRUCT *pLR_REG = &(REG[LR_REG_INDEX]);
-	struct REG_STRUCT *pPC_REG = &(REG[PC_REG_INDEX]);
-
-	for(;;){
-		binary = MEM.code[pPC_REG->data];
-		opcode = (binary & MASK_OP) >> POS_OP;				// OPCODE에 따라 CLU상태를 바꾼다
-			
-	}
 }

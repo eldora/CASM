@@ -7,6 +7,5 @@
 
 xxbit_t wordParsing(char *pWord[], int wordNumber);
 bool asm2bin(char *asmtxt);
-bool bin2com();
 
 #endif

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "hardware.h"
 #include "parsing.h"
+#include "core.h"
 
 int main(int argc, char *argv[]){
 	if(argc!=2){
@@ -9,7 +10,7 @@ int main(int argc, char *argv[]){
 	}
 
 	asm2bin(argv[1]);
-	bin2com();
+	runCPU();
 
 	printMemory();
 	printCPU();
