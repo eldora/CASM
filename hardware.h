@@ -55,8 +55,15 @@
 #define POS_TP					POS_RD			// Type
 #define POS_CF					POS_RN			// CPSR Flag
 
+// MEMORY MACRO FUNCTION
+#define SWITCH_MASK(binary, pos)	((binary >> pos)&0x01)
+
 // MEM_MAP MACRO
 #define	MEM_MAP_SIZE		30
+
+//
+#define WORD_CHAR_SIZE	15
+#define LINE_CHAR_SIZE	(WORD_CHAR_SIZE*4)
 
 #define OPCODE_GAP_B		(BL-B-1)		// 17 - 10 - 1: -1의 이유는 type BL의 값이 1이므로
 #define USING_ENUM_TYPE
@@ -167,8 +174,11 @@ struct MEM_STRUCT{
 };
 
 struct MEM_MAP_STRUCT{
-	char name[30];
-	unsigned int index;	
+	struct MODULE_STRUCT{
+		char name[30];
+		unsigned int index;	
+	}MODULE[MEM_MAP_SIZE];
+	unsigned int lastIndex;
 };
 
 /*
@@ -188,10 +198,11 @@ extern struct CPSR_STRUCT CPSR;
 extern struct REG_STRUCT REG[BIT_TYPE];										// Register Bank
 extern const struct OP_STRUCT OP_TABLE[OPCODE_NUMBER];		// CPU에서 실행가능한 Instruct SET의 집합
 extern struct MEM_STRUCT MEM;															// Memory
-extern struct MEM_MAP_STRUCT MEM_MAP[MEM_MAP_SIZE];				// Memory Map
+extern struct MEM_MAP_STRUCT MEM_MAP;											// Memory Map
 
 /*** Debug 함수 ***/
 void printMemory();
+void printMemMap();
 void printCPU();
 
 /*** OPCODE 함수 선언 ***/

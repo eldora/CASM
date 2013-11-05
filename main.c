@@ -10,9 +10,10 @@ int main(int argc, char *argv[]){
 	}
 
 	asm2bin(argv[1]);
-	runCPU();
-
+	printMemMap();
 	printMemory();
+
+	runCPU();
 	printCPU();
 
 	//printf("0x%X, 0x%X\n", &(MEM.code[0]), &(MEM.code[1]));

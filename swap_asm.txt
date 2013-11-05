@@ -3,10 +3,11 @@ MOV	r2	r0
 MOV	r3	r1
 MOV	r0	r3
 MOV	r1	r2
+IRET
 
 $main
-MOV	r0	#1
+MOV	r0	#2
 MOV	r1	<1	#1
 BL	$swap
-
+HALT	 
 HALT

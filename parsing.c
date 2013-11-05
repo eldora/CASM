@@ -70,13 +70,26 @@ xxbit_t wordParsing(char *pWord[], int wordNumber){
 			goto B_COMMON;
 		case BL:
 			type = 1;
+			binaryCode &= (0x00<<POS_OP);
+			binaryCode |= (B<<POS_OP);
 			goto B_COMMON;
 		case IRET:
 			type = 2;
+			binaryCode &= (0x00<<POS_OP);
+			binaryCode |= ((B<<POS_OP) | (type<<POS_TP));
+			break;
 B_COMMON:
 			ch = *(pWord[1]);
 			if((char)tolower(ch) == 'r')
 				or = atoi(pWord[1]+1);
+			else if((char)ch == '$'){
+				for(i=0; i<MEM_MAP.lastIndex; i++){
+					if(!strcmp(MEM_MAP.MODULE[i].name, pWord[1])){
+						or = i;
+						break;
+					}
+				}
+			}
 			else{
 				for(i=0; i<6; i++){
 					if(!strcmp(suffix[i], pWord[1])){
@@ -107,7 +120,7 @@ B_COMMON:
 		default:
 			break;
 	}
-#if 1
+#if 0
 	printf("wordNumber: %d\n", wordNumber);
 	for(i=0; i<wordNumber; i++){
 		printf("%d: %s\n", (int)opcode, pWord[i]);
@@ -120,8 +133,8 @@ B_COMMON:
 /*** ASEMMBLY -> BINARY Function ***/
 bool asm2bin(char *asmtxt){
 	char buf[255];
-	char *pLine[10], *pWord[5];
-	int fd, lineNumber, wordNumber, i, j, optSize, mapIndex;
+	char *pLine[50], *pWord[5];
+	int fd, lineNumber, wordNumber, i, j, optSize;
 
 	if((fd = open(asmtxt, O_RDONLY)) < 0){											// 어셈블리어 텍스트 파일 로드
 		printf("%s file can't open!!\n", asmtxt);
@@ -129,17 +142,27 @@ bool asm2bin(char *asmtxt){
 		return FALSE;
 	}
 
-	read(fd, buf, 255);																					// 버퍼만큼 읽음(추후 수정)
+	read(fd, buf, sizeof(buf));																					// 버퍼만큼 읽음(추후 수정)
 
-	lineNumber = mapIndex = 0;
+#if 0
+	printf("buf: %s\n", buf);
+#endif
+
+	lineNumber = 0;
 	pLine[lineNumber++] = strtok(buf, "\n");											// 라인별로 나눠서 해당 포인터를 pLine배열에 저장해놓음
 	while(pLine[lineNumber++] = strtok(NULL, "\n"));
 
+#if 1
+	printf("===CODE===\n");
+	for(i=0; i<lineNumber-2; i++)
+		printf("%d: %s\n", i, pLine[i]);
+#endif
+
 	for(i=0; i<lineNumber-2; i++){
 		if(pLine[i][0] == '$'){
-			strcpy(MEM_MAP[mapIndex].name, pLine[i]);
-			MEM_MAP[mapIndex].index = i;
-			mapIndex++;
+			strcpy(MEM_MAP.MODULE[MEM_MAP.lastIndex].name, pLine[i]);
+			MEM_MAP.MODULE[MEM_MAP.lastIndex].index = (i-MEM_MAP.lastIndex);
+			MEM_MAP.lastIndex++;
 		}
 	}
 
@@ -149,6 +172,13 @@ bool asm2bin(char *asmtxt){
 
 		pWord[wordNumber++] = strtok(pLine[i], "\t ");
 		while(pWord[wordNumber++] = strtok(NULL, "\t "));
+
+#if 0
+		printf("===WORD===\n");
+		printf("LINE:%s\n", pLine[i]);
+		for(j=0; j<wordNumber; j++)
+			printf("%d: %s\n", j, pWord[j]);
+#endif
 
 		if(*pWord[0] == '$')
 			continue;

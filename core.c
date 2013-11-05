@@ -29,6 +29,10 @@ bool runCPU(){
 	basic_t dataWD, dataRD, dataAddr;
 	basic_t stackWD, stackRD, stackAddr;
 
+	// main함수의 Entry Pointer를 PC값으로 세팅: FALSE이면 main을 못찾았으므로 종료
+	if(!setEntryPoint())
+		return FALSE;
+
 	for(;;){
 #if 0
 		printf("STEP:%d --CPU --\n", pPC_REG->data);
@@ -49,17 +53,22 @@ bool runCPU(){
 		opcode = getOPCODE(binary);								// EXTERNAL_OPCODE를 얻기 위해 getOPCODE로 opcode를 얻는다
 		table = getCLU_TABLE(opcode, binary);			// OPCODE의 CLU_TABLE를 얻는다
 
+#if 0
+		printf("PC:%d, opcode:%d\n", pPC_REG->data, opcode);
+		printf("TABLE:%0X, %0X\n", table->SWITCH.component, table->SWITCH.mux);
+#endif
+
 		if(opcode == (optype_t)HALT)							// PROGRAM END CONDITION
 			break;
 
-		if(table->SWITCH.component >> S_RERF)
+		if(SWITCH_MASK(table->SWITCH.component, S_RERF))
 			cReadRegister(table, binary, regRD);
 		//Decode End
 		
 		//Execute Start
 		
 		dataWD = regRD[1];
-		if(table->SWITCH.mux >> S_BSEL){
+		if(SWITCH_MASK(table->SWITCH.mux, S_BSEL)){
 			switch(table->BSEL){
 				case 0:
 					break;
@@ -78,7 +87,7 @@ bool runCPU(){
 			}// 이 Switch문을 함수로 나눌지는 고민
 		}
 
-		if(table->SWITCH.component >> S_ALUFN)
+		if(SWITCH_MASK(table->SWITCH.component, S_ALUFN))
 			cExecuteALU(table, regRD, &result);
 		else
 			result = regRD[1];
@@ -89,29 +98,34 @@ bool runCPU(){
 		printf("Result: %d\n", result);
 #endif
 
-		if(table->SWITCH.component >> S_WEDF){
+		if(SWITCH_MASK(table->SWITCH.component, S_WEDF)){
 			if(table->WEDF == CLU_R);
 			if(table->WEDF == CLU_W);
 		}
 
-		if(table->SWITCH.mux >> S_ADSEL)
+		if(SWITCH_MASK(table->SWITCH.mux, S_ADSEL))
 			result = (table->ADSEL==1) ? dataRD : result;
 
-		if(table->SWITCH.component >> S_WESF);
+		if(SWITCH_MASK(table->SWITCH.component, S_WESF));
 
-		if(table->SWITCH.mux >> S_WDSEL)
+		if(SWITCH_MASK(table->SWITCH.mux, S_WDSEL))
 			result = (table->WDSEL==1) ? stackRD : result;
 
-		if(table->SWITCH.component >> S_WERF)
+		if(SWITCH_MASK(table->SWITCH.component, S_WERF))
 			cWriteRegister(table, binary, result);
 
-		if(table->SWITCH.mux >> S_BRYN)
+		if(SWITCH_MASK(table->SWITCH.mux, S_BRYN))
 			CPSR.br_yn = selectBRYN(binary);
 
-		if(table->SWITCH.mux >> S_LRSF)
+		if(SWITCH_MASK(table->SWITCH.mux, S_LRSF))
 			pLR_REG->data = pPC_REG->data + PC_NEXT;
 
-		if(table->SWITCH.mux >> S_PCSEL){
+
+		// Branch할 주소를 리턴
+		if(CPSR.br_yn)
+			bryn = getModuleAddress(binary);
+
+		if(SWITCH_MASK(table->SWITCH.mux, S_PCSEL)){
 			switch(table->PCSEL){
 				case 0:
 					pPC_REG->data += PC_NEXT;				break;
@@ -126,6 +140,10 @@ bool runCPU(){
 		// pc값 변화 적용
 		
 		//Execute End
+#if 1
+		printf("\nbinary: %0X\n", binary);
+		printCPU();
+#endif
 	}
 }
 
@@ -155,7 +173,7 @@ bool cReadRegister(const struct CLU_STRUCT *table, xxbit_t binary, basic_t *reg)
 }
 
 bool cWriteRegister(const struct CLU_STRUCT *table, xxbit_t binary, basic_t data){
-	int regIndex;
+	unsigned int regIndex;
 	regIndex = (table->WASEL==1) ? ((binary & MASK_R2) >> POS_R2) : ((binary & MASK_RD) >> POS_RD);
 
 	REG[regIndex].data = data;
@@ -166,6 +184,22 @@ bool cExecuteALU(const struct CLU_STRUCT *table, basic_t *reg, basic_t *result){
 	*result = table->ALUFN(reg[0], reg[1]);
 
 	return TRUE;
+}
+
+basic_t getModuleAddress(xxbit_t binary){
+	unsigned int memMapIndex;
+	memMapIndex = (binary & MASK_OR) >> POS_OR;
+	return MEM_MAP.MODULE[memMapIndex].index;
+}
+
+bool setEntryPoint(){
+	int i;
+	for(i=0; i<MEM_MAP.lastIndex; i++)
+		if(!strcmp(MEM_MAP.MODULE[i].name, "$main")){
+			REG[PC_REG_INDEX].data = MEM_MAP.MODULE[i].index;
+			return TRUE;
+		}
+	return FALSE;
 }
 
 // 함수명 고민
@@ -255,9 +289,13 @@ const struct CLU_STRUCT *getCLU_TABLE(optype_t opcode, xxbit_t binary){
 			table = CLU_TABLE[opcode][0];
 			break;
 		case B:
+			table = CLU_TABLE[B][0];
+			break;
 		case BL:
+			table = CLU_TABLE[B][1];
+			break;
 		case IRET:
-			table = CLU_TABLE[opcode][0];
+			table = CLU_TABLE[B][2];
 			break;
 		case PUSH:
 		case POP:

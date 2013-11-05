@@ -48,7 +48,18 @@
 - hardware.h: MEM_MAP_STRUCT 추가
 - Add Files: swap_asm.txt, swap_asm_pushpop.txt
 
+#### v3.2(20131106) ####
++ swap.asm_txt까지 정상동작 확인
+- hardware.h: MEM_MAP_STRUCT, SWITCH_MASK 매크로 함수 추가
+- parsing.c: $FUNCTION 명령어를 전처리 과정 진행, MEM_MAP에 정보 갱신
+- parsing.c: pLine 배열 크기 증가(10줄 이상의 정보가 들어오면 세그먼테이션 에러)
+- hardware.c: CLU_TABLE 초기화 부분에서 B,BL,IRET 부분 안나눠놨었음
+- core.c: getModuleAddress, setEntryPoint 함수 추가
+- core.c: getCLU_TABLE함수에서 B,BL,IRET에 적절한 table 정보 대입
+
 ### 해야할 일 ###
++ runCPU에서 스택부분 코드 구현
++ DATA, STACK SECTION 사용하도록 구현
 + parsing.c에서 전처리 과정으로 ip, sp, lr, pc 문자열을 r12,13,14,15로 변환과정을 추가해야 함
 + parsing.c에서 strtok로 EOF가 제대로 처리되지 않아 for문에서 lineNumber-2를 해줌(strtok에서 EOF판별법 알아보기)
 - TICK별로 CPU를 구동할 때 Register Bank를 Read, Write 상태로 설정해야 함(현재는 Write상태만)
