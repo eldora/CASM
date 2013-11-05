@@ -44,6 +44,10 @@
 - Makefile: dubug 명령어 추가
 - pptx, xlsx 파일 업데이트(CLU_SWITCH 부분 추가 및 기타 요소 등...)
 
+#### v3.1(20131105) ####
+- hardware.h: MEM_MAP_STRUCT 추가
+- Add Files: swap_asm.txt, swap_asm_pushpop.txt
+
 ### 해야할 일 ###
 + parsing.c에서 전처리 과정으로 ip, sp, lr, pc 문자열을 r12,13,14,15로 변환과정을 추가해야 함
 + parsing.c에서 strtok로 EOF가 제대로 처리되지 않아 for문에서 lineNumber-2를 해줌(strtok에서 EOF판별법 알아보기)

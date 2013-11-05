@@ -121,7 +121,7 @@ B_COMMON:
 bool asm2bin(char *asmtxt){
 	char buf[255];
 	char *pLine[10], *pWord[5];
-	int fd, lineNumber, wordNumber, i, j, optSize;
+	int fd, lineNumber, wordNumber, i, j, optSize, mapIndex;
 
 	if((fd = open(asmtxt, O_RDONLY)) < 0){											// 어셈블리어 텍스트 파일 로드
 		printf("%s file can't open!!\n", asmtxt);
@@ -131,9 +131,17 @@ bool asm2bin(char *asmtxt){
 
 	read(fd, buf, 255);																					// 버퍼만큼 읽음(추후 수정)
 
-	lineNumber=0;
+	lineNumber = mapIndex = 0;
 	pLine[lineNumber++] = strtok(buf, "\n");											// 라인별로 나눠서 해당 포인터를 pLine배열에 저장해놓음
 	while(pLine[lineNumber++] = strtok(NULL, "\n"));
+
+	for(i=0; i<lineNumber-2; i++){
+		if(pLine[i][0] == '$'){
+			strcpy(MEM_MAP[mapIndex].name, pLine[i]);
+			MEM_MAP[mapIndex].index = i;
+			mapIndex++;
+		}
+	}
 
 	for(i=0; i<lineNumber-2; i++){																// 라인을 읽어와 각 워드를 읽고 이에 맞는 binary값을 써줌
 		memset(pWord, 0, sizeof(pWord));
@@ -141,6 +149,9 @@ bool asm2bin(char *asmtxt){
 
 		pWord[wordNumber++] = strtok(pLine[i], "\t ");
 		while(pWord[wordNumber++] = strtok(NULL, "\t "));
+
+		if(*pWord[0] == '$')
+			continue;
 
 		MEM.code[MEM.code_lastIndex++] = wordParsing(pWord, wordNumber-1);	// Debug용으로 workNumber를 매개변수로 넘겨줌
 	}

@@ -55,6 +55,9 @@
 #define POS_TP					POS_RD			// Type
 #define POS_CF					POS_RN			// CPSR Flag
 
+// MEM_MAP MACRO
+#define	MEM_MAP_SIZE		30
+
 #define OPCODE_GAP_B		(BL-B-1)		// 17 - 10 - 1: -1의 이유는 type BL의 값이 1이므로
 #define USING_ENUM_TYPE
 // OPCODE 순서와 OP_TABLE 순서는 동일해야 함
@@ -163,7 +166,13 @@ struct MEM_STRUCT{
 	unsigned int stack_baseAddr;		// Data영역의 Base Address = &(Data[0])
 };
 
+struct MEM_MAP_STRUCT{
+	char name[30];
+	unsigned int index;	
+};
+
 /*
+ * MEM_STRUCT MEM[3]; // 0:CODE, 1:DATA, 2:STACK 사용법도 고려
 struct MEM_STRUCT{
 	xxbit_t 
 	unsigned int index;
@@ -173,12 +182,13 @@ struct MEM_STRUCT{
 
 /*** 하드웨어 구조체 전역변수 선언 ***/
 /** 1. CPU **/
-extern struct CLU_STRUCT *pCLU;											// CLU Register
+extern struct CLU_STRUCT *pCLU;														// CLU Register
 extern const struct CLU_STRUCT CLU_TABLE[BIT_TYPE][CLU_MODE][CLU_TABLE_SIZE];			// CLU TABLE
 extern struct CPSR_STRUCT CPSR;
-extern struct REG_STRUCT REG[BIT_TYPE];							// Register Bank
+extern struct REG_STRUCT REG[BIT_TYPE];										// Register Bank
 extern const struct OP_STRUCT OP_TABLE[OPCODE_NUMBER];		// CPU에서 실행가능한 Instruct SET의 집합
-extern struct MEM_STRUCT MEM;												// Memory
+extern struct MEM_STRUCT MEM;															// Memory
+extern struct MEM_MAP_STRUCT MEM_MAP[MEM_MAP_SIZE];				// Memory Map
 
 /*** Debug 함수 ***/
 void printMemory();

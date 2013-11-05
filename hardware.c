@@ -46,6 +46,7 @@ const struct OP_STRUCT OP_TABLE[OPCODE_NUMBER] = {
 	{"HALT", HALT, CLU_TABLE[15]},
 };
 struct MEM_STRUCT MEM = {0,};
+struct MEM_MAP_STURCT	MEM_MAP[MEM_MAP_SIZE];
 
 /*** 하드웨어 관련 함수 ***/
 void printMemory(){
