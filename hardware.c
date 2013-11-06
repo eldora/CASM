@@ -24,7 +24,7 @@ const struct CLU_STRUCT CLU_TABLE[BIT_TYPE][CLU_MODE][CLU_TABLE_SIZE] = {
 	{{0b01000, 0b011000011, NULL,			CLU_R,	UNUSED, UNUSED, UNUSED, 0, 1, UNUSED, UNUSED, UNUSED, UNUSED, 0},								// B,		MODE TYPE:1
 	 {0b01000, 0b111000011, NULL,			CLU_R,	UNUSED, UNUSED, 1,			0, 1, UNUSED, UNUSED, UNUSED, UNUSED, 0},								// BL,	MODE TYPE:1
 	 {0b00000, 0b001000000, NULL,			UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, 2, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED}, },	// IRET,MODE TYPE:1
-	{{0b01001, 0b011100010, NULL,			CLU_R,	UNUSED, CLU_W,	UNUSED, 0, 2, 0, UNUSED, UNUSED, UNUSED, 0}, },									// PUSH,MODE TYPE:1
+	{{0b01001, 0b011100010, NULL,			CLU_R,	UNUSED, CLU_W,	UNUSED, 0, 0, 0, UNUSED, UNUSED, UNUSED, 0}, },									// PUSH,MODE TYPE:1
 	{{0b00101, 0b001011000, NULL,			CLU_W,	UNUSED, CLU_R,	UNUSED, UNUSED, 0, UNUSED, 1, 1, UNUSED, UNUSED}, },						// POP, MODE TYPE:1
 };
 struct CPSR_STRUCT CPSR = {0,};
@@ -56,7 +56,8 @@ void printMemory(){
 		printf("%04x\n", MEM.code[i]);
 
 	printf("===DATA SECTION===\n");
-	for(i=0; i<MEM.data_lastIndex; i++)
+	//for(i=0; i<MEM.data_lastIndex; i++)
+	for(i=0; i<3; i++)
 		printf("%04x\n", MEM.data[i]);
 
 	printf("===STACK SECTION===\n");
@@ -67,13 +68,15 @@ void printMemory(){
 void printMemMap(){
 	int i;
 
-	printf("===Memory MAP===\n");
+	printf("====Memory MAP====\n");
 	for(i=0; i<MEM_MAP.lastIndex; i++)
 		printf("%d:%s, %d\n", i, MEM_MAP.MODULE[i].name, MEM_MAP.MODULE[i].index);
 }
 
 void printCPU(){
 	int i;
+
+	printf("===Register Bank===\n");
 	for(i=0; i<BIT_TYPE; i++)
 		printf("REG%02d: %d\n", i, REG[i].data);
 }

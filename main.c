@@ -13,10 +13,10 @@ int main(int argc, char *argv[]){
 
 	for(i=1; i<argc; i++)
 		asm2bin(argv[i]);
-	printMemMap();
-	printMemory();
 
 	runCPU();
+	printMemMap();
+	printMemory();
 	printCPU();
 
 	//printf("0x%X, 0x%X\n", &(MEM.code[0]), &(MEM.code[1]));

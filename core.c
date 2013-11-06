@@ -99,14 +99,22 @@ bool runCPU(){
 #endif
 
 		if(SWITCH_MASK(table->SWITCH.component, S_WEDF)){
-			if(table->WEDF == CLU_R);
-			if(table->WEDF == CLU_W);
+			if(table->WEDF == CLU_R)
+				cReadDataMemory(&dataRD, dataAddr);
+			if(table->WEDF == CLU_W)
+				cWriteDataMemory(dataWD, dataAddr);
 		}
 
 		if(SWITCH_MASK(table->SWITCH.mux, S_ADSEL))
-			result = (table->ADSEL==1) ? dataRD : result;
+			result = stackWD = (table->ADSEL==1) ? dataRD : result;
 
-		if(SWITCH_MASK(table->SWITCH.component, S_WESF));
+		//Stack Function
+		if(SWITCH_MASK(table->SWITCH.component, S_WESF)){
+			if(table->WESF == CLU_R)
+				cReadStackMemory(&stackRD);
+			if(table->WESF == CLU_W)
+				cWriteStackMemory(stackWD);
+		}
 
 		if(SWITCH_MASK(table->SWITCH.mux, S_WDSEL))
 			result = (table->WDSEL==1) ? stackRD : result;
@@ -142,6 +150,7 @@ bool runCPU(){
 		//Execute End
 #if 0
 		printf("\nbinary: %0X\n", binary);
+		printMemory();
 		printCPU();
 #endif
 	}
@@ -177,6 +186,40 @@ bool cWriteRegister(const struct CLU_STRUCT *table, xxbit_t binary, basic_t data
 	regIndex = (table->WASEL==1) ? ((binary & MASK_R2) >> POS_R2) : ((binary & MASK_RD) >> POS_RD);
 
 	REG[regIndex].data = data;
+	return TRUE;
+}
+
+// 현재는 MEM.data Index로 주소값을 사용
+bool cReadDataMemory(basic_t *data, basic_t address){
+	if(address<0 || address >= MEM_DATA_SIZE)
+		return FALSE;
+
+	*data = MEM.data[address];
+	return TRUE;
+}
+bool cWriteDataMemory(basic_t data, basic_t address){
+	if(address<0 || address >= MEM_DATA_SIZE)
+		return FALSE;
+
+	MEM.data[address] = data;
+	return TRUE;
+}
+bool cReadStackMemory(basic_t *data){
+	unsigned int stackIndex;
+	stackIndex = MEM.stack_lastIndex;
+	if(stackIndex < 0)
+		return FALSE;
+	MEM.stack_lastIndex -= PC_NEXT;
+	*data = MEM.stack[stackIndex];
+	return TRUE;
+}
+bool cWriteStackMemory(basic_t data){
+	unsigned int stackIndex;
+	stackIndex = MEM.stack_lastIndex;
+	if(stackIndex >= MEM_STACK_SIZE)
+		return FALSE;
+	MEM.stack_lastIndex += PC_NEXT;
+	MEM.stack[stackIndex] = data;
 	return TRUE;
 }
 

@@ -61,6 +61,11 @@
 + 다수의 txt파일로 동작 가능
 - Add Files: swap_asm_1.txt, swap_asm_2.txt
 
+#### v3.4(20131106) ####
++ core.c: runCPU() - PUSH, POP, STR, LDR 기능 추가
+- Makefile: Make pushpop, Make data 명령어 추가
+- Add Files: swap_asm_data.txt
+
 ### 해야할 일 ###
 + runCPU에서 스택부분 코드 구현
 + DATA, STACK SECTION 사용하도록 구현
