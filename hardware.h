@@ -179,6 +179,7 @@ struct MEM_MAP_STRUCT{
 		unsigned int index;	
 	}MODULE[MEM_MAP_SIZE];
 	unsigned int lastIndex;
+	unsigned int lineIndex;
 };
 
 /*

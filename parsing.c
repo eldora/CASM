@@ -153,7 +153,7 @@ bool asm2bin(char *asmtxt){
 	while(pLine[lineNumber++] = strtok(NULL, "\n"));
 
 #if 1
-	printf("===CODE===\n");
+	printf("====%s CODE====\n", asmtxt);
 	for(i=0; i<lineNumber-2; i++)
 		printf("%d: %s\n", i, pLine[i]);
 #endif
@@ -161,9 +161,12 @@ bool asm2bin(char *asmtxt){
 	for(i=0; i<lineNumber-2; i++){
 		if(pLine[i][0] == '$'){
 			strcpy(MEM_MAP.MODULE[MEM_MAP.lastIndex].name, pLine[i]);
-			MEM_MAP.MODULE[MEM_MAP.lastIndex].index = (i-MEM_MAP.lastIndex);
+			//MEM_MAP.MODULE[MEM_MAP.lastIndex].index = (i-MEM_MAP.lastIndex);
+			MEM_MAP.MODULE[MEM_MAP.lastIndex].index = MEM_MAP.lineIndex;
 			MEM_MAP.lastIndex++;
 		}
+		else
+			MEM_MAP.lineIndex++;
 	}
 
 	for(i=0; i<lineNumber-2; i++){																// 라인을 읽어와 각 워드를 읽고 이에 맞는 binary값을 써줌

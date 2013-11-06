@@ -4,12 +4,15 @@
 #include "core.h"
 
 int main(int argc, char *argv[]){
-	if(argc!=2){
+	int i;
+
+	if(argc<2){
 		printf("Using: %s Assembly_File_Name\n", argv[0]);
 		return -1;
 	}
 
-	asm2bin(argv[1]);
+	for(i=1; i<argc; i++)
+		asm2bin(argv[i]);
 	printMemMap();
 	printMemory();
 

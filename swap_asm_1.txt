@@ -1,0 +1,7 @@
+$swap
+MOV	r2	r0
+MOV	r3	r1
+MOV	r0	r3
+MOV	r1	r2
+IRET
+END

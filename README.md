@@ -57,6 +57,10 @@
 - core.c: getModuleAddress, setEntryPoint 함수 추가
 - core.c: getCLU_TABLE함수에서 B,BL,IRET에 적절한 table 정보 대입
 
+#### v3.3(20131106) ####
++ 다수의 txt파일로 동작 가능
+- Add Files: swap_asm_1.txt, swap_asm_2.txt
+
 ### 해야할 일 ###
 + runCPU에서 스택부분 코드 구현
 + DATA, STACK SECTION 사용하도록 구현

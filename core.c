@@ -140,7 +140,7 @@ bool runCPU(){
 		// pc값 변화 적용
 		
 		//Execute End
-#if 1
+#if 0
 		printf("\nbinary: %0X\n", binary);
 		printCPU();
 #endif
