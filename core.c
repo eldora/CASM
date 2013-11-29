@@ -206,11 +206,12 @@ bool cWriteDataMemory(basic_t data, basic_t address){
 }
 bool cReadStackMemory(basic_t *data){
 	unsigned int stackIndex;
-	stackIndex = MEM.stack_lastIndex;
-	if(stackIndex < 0)
-		return FALSE;
 	MEM.stack_lastIndex -= PC_NEXT;
-	*data = MEM.stack[stackIndex];
+	if(MEM.stack_lastIndex < 0){
+		MEM.stack_lastIndex = 0;
+		return FALSE;
+	}
+	*data = MEM.stack[MEM.stack_lastIndex];
 	return TRUE;
 }
 bool cWriteStackMemory(basic_t data){

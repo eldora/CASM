@@ -15,6 +15,8 @@ IRET
 $main
 MOV	r0	#1
 MOV	r1	<1	#1
+MOV	r8	#8
+MOV r9	#9
 BL	$swap
 
 HALT

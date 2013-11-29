@@ -53,16 +53,16 @@ void printMemory(){
 	int i;
 	printf("===CODE SECTION===\n");
 	for(i=0; i<MEM.code_lastIndex; i++)
-		printf("%04x\n", MEM.code[i]);
+		printf("0x%04x\n", MEM.code[i]);
 
 	printf("===DATA SECTION===\n");
 	//for(i=0; i<MEM.data_lastIndex; i++)
 	for(i=0; i<3; i++)
-		printf("%04x\n", MEM.data[i]);
+		printf("0x%04x\n", MEM.data[i]);
 
 	printf("===STACK SECTION===\n");
 	for(i=0; i<MEM.stack_lastIndex; i++)
-		printf("%04x\n", MEM.stack[i]);
+		printf("0x%04x\n", MEM.stack[i]);
 }
 
 void printMemMap(){

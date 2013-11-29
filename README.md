@@ -66,16 +66,24 @@
 - Makefile: Make pushpop, Make data 명령어 추가
 - Add Files: swap_asm_data.txt
 
+#### v3.4(20131106) ####
++ core.c: runCPU() - PUSH, POP, STR, LDR 기능 추가
+- Makefile: Make pushpop, Make data 명령어 추가
+- Add Files: swap_asm_data.txt
+
+#### v3.5(20131130) ####
++ core.c: cReadStackMemory 수정하여 Pop이 제대로 작동하도록 수정
++ hardware.c: debug용의 print 함수들 16진수로 표기
+
 ### 해야할 일 ###
-+ runCPU에서 스택부분 코드 구현
 + DATA, STACK SECTION 사용하도록 구현
 + parsing.c에서 전처리 과정으로 ip, sp, lr, pc 문자열을 r12,13,14,15로 변환과정을 추가해야 함
 + parsing.c에서 strtok로 EOF가 제대로 처리되지 않아 for문에서 lineNumber-2를 해줌(strtok에서 EOF판별법 알아보기)
 - TICK별로 CPU를 구동할 때 Register Bank를 Read, Write 상태로 설정해야 함(현재는 Write상태만)
-- runCPU 함수 완성 - CLU Table를 참조하여 동작하게끔 구현
 - rupCPU 구동 방식을 시뮬레이터에 가깝게 할지 에뮬레이터에 가깝게 할지 고민
 
 #### NOTE ####
+- 본 프로그램은 CPU 시뮬레이터에 입각하여 작성하였으며, 하드웨어적인 요소를 최대한 논리적으로 구성하여 소프트웨어로 표현함
 - 시뮬레이터는 현실과 동일하게 구성, 에뮬레이터는 실행결과가 동일하게 나오는 것
 - 컴포넌트(PC, MEM, ALU etc..)등을 어떻게 처리할지 고민(FLOW를 고정?)
 - Tick: CLU상에서의 내부 클럭 처리 단위
