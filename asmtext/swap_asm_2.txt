@@ -1,0 +1,5 @@
+$main
+MOV	r0	#2
+MOV	r1	<1	#1
+BL	$swap
+HALT

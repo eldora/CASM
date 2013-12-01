@@ -75,10 +75,17 @@
 + core.c: cReadStackMemory 수정하여 Pop이 제대로 작동하도록 수정
 + hardware.c: debug용의 print 함수들 16진수로 표기
 
+#### v4.0(20131202) ####
++ Makefile: 매크로를 사용해 Makefile를 재작성하고 소스디렉토리와 어셈블리 파일 디렉토리로 구분함
++ parsing.c: asm2bin함수에서 어셈블리 파일을 읽어올 때 파일 크기에 상관없이 읽어올 수 있도록 바꿈, 배열 동적으로 구현
+- 헤더 파일에 있었던 C 라이브러리 파일을 소스 파일로 옮김
+- printCPU 함수에서 임시적으로 DATA SECTION을 3만큼 보여준 것을 lastIndex만큼 보여주도록 설정
+- Wall Warning 제거 
+- Makefile에서 DEFINES = 에 SHOW_EXECUTE 매크로 주석을 제거하면 각 틱별로 CPU Resource상태를 볼 수 있음
+
+
 ### 해야할 일 ###
-+ DATA, STACK SECTION 사용하도록 구현
 + parsing.c에서 전처리 과정으로 ip, sp, lr, pc 문자열을 r12,13,14,15로 변환과정을 추가해야 함
-+ parsing.c에서 strtok로 EOF가 제대로 처리되지 않아 for문에서 lineNumber-2를 해줌(strtok에서 EOF판별법 알아보기)
 - TICK별로 CPU를 구동할 때 Register Bank를 Read, Write 상태로 설정해야 함(현재는 Write상태만)
 - rupCPU 구동 방식을 시뮬레이터에 가깝게 할지 에뮬레이터에 가깝게 할지 고민
 

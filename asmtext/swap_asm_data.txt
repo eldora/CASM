@@ -1,0 +1,10 @@
+$swap
+STR	r1	r10	#1
+LDR	r6	r10	#1
+IRET
+
+$main
+MOV	r0	#1
+MOV	r1	<1	#1
+BL	$swap
+HALT
