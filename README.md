@@ -83,8 +83,8 @@
 - Wall Warning 제거 
 - Makefile에서 DEFINES = 에 SHOW_EXECUTE 매크로 주석을 제거하면 각 틱별로 CPU Resource상태를 볼 수 있음
 
-#### v4.01(20131202) ####
-- git 파일 위치 설정
+#### v4.1(20131202) ####
+- git 파일 위치 설정 및 Source/include로 해더파일 이동
 
 ### 해야할 일 ###
 + parsing.c에서 전처리 과정으로 ip, sp, lr, pc 문자열을 r12,13,14,15로 변환과정을 추가해야 함

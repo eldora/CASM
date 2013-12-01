@@ -12,7 +12,7 @@ SOURCE_DIR = source
 BUILD_DIR = build
 ASMFILES_DIR = asmtext
 
-C_OPTS = -I. \
+C_OPTS = -I"$(SOURCE_DIR)/include"\
 				 -std=c99 \
 				 -O2 \
 				 -Wall \
