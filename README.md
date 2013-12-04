@@ -86,6 +86,9 @@
 #### v4.1(20131202) ####
 - git 파일 위치 설정 및 Source/include로 해더파일 이동
 
+#### v4.2(20131204) ####
+- PPT 한이음 제출 전 최종 파일
+
 ### 해야할 일 ###
 + parsing.c에서 전처리 과정으로 ip, sp, lr, pc 문자열을 r12,13,14,15로 변환과정을 추가해야 함
 - TICK별로 CPU를 구동할 때 Register Bank를 Read, Write 상태로 설정해야 함(현재는 Write상태만)
